@@ -38,7 +38,7 @@ import base64
 #from sagemaker.serializers import IdentitySerializer
 
 # Fill this in with the name of your deployed model
-ENDPOINT = "image-classification-2021-12-04-11-38"
+ENDPOINT = "image-classification-2021-12-07-01-09-22-485"
 runtime= boto3.client('runtime.sagemaker')
 
 def lambda_handler(event, context):
@@ -56,7 +56,7 @@ def lambda_handler(event, context):
 
     return {
         'statusCode': 200,
-        'body': json.dumps(event)
+        'body': event
         }
 
 #Filter inferences confidence
@@ -71,16 +71,9 @@ def lambda_handler(event, context):
 
     # Grab the inferences from the event
     inferences = event['inferences']
-    meets_threshold = False
+
     # Check if any values in our inferences are above THRESHOLD
-    if inferences[0] > inferences[1]:
-        if inferences[0] > THRESHOLD:
-            meets_threshold = True
-    elif inferences[0] < inferences[1]:
-        if inferences[1] > THRESHOLD:
-            meets_threshold = True
-    else:
-        meets_threshold = False
+    meets_threshold = max(inferences) >= THRESHOLD
 
 
     # If our threshold is met, pass our data back out of the
@@ -92,5 +85,5 @@ def lambda_handler(event, context):
 
     return {
         'statusCode': 200,
-        'body': json.dumps(event)
+        'body': event
     }
